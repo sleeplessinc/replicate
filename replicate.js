@@ -141,7 +141,7 @@ replicate = function( id, data, callback ) {
 		replicate.inject( e, a );
 
 		if( callback ) {
-			callback( e, a, l );
+			callback( e, a, i );
 		}
 	}
 
