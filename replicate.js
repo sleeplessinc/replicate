@@ -30,10 +30,8 @@ replicate = function( id, data, callback ) {
 
 		replicate.substitute = function( s, data ) {
 			for( var key in data ) {
-				//if( typeof data[ key ] === "string" ) {
-					var re = new RegExp( "__" + key + "__", "g" );
-					s = s.replace( re, ""+(data[ key ]) );
-				//}
+				var re = new RegExp( "__" + key + "__", "g" );
+				s = s.replace( re, ""+(data[ key ]) );
 			}
 			return s;
 		}
@@ -84,7 +82,6 @@ replicate = function( id, data, callback ) {
 						clone.parentNode.removeChild( clone );
 					}
 				}
-				clones.length = 0;	// empty the clones array
 			}
 			tem.mom.insertBefore( tem, tem.sib ); // put template back into DOM
 		}
@@ -93,20 +90,18 @@ replicate = function( id, data, callback ) {
 
 	replicate.reset( id );
 
-	var tem = replicate.templates[ id ];		// fetch from cache
-	if( ! tem ) {
-		if( typeof id === "string" ) {
-			tem = document.getElementById( id );	// fetch from DOM
-		}
-		else {
-			tem = id;
-		}
-		replicate.templates[ id ] = tem;		// store in cache
+	var tem = null; 
+	if( typeof id === "string" ) {
+		tem = document.getElementById( id );
+	}
+	else {
+		tem = id;
 	}
 	if( ! tem ) {
 		console.log( "replicate: template not found: " + id );
 		return;
 	}
+	replicate.templates[ id ] = tem;		// store in cache for later "reset".
 
 	if( typeof data !== "object" ) {
 		console.log( "replicate: invalid replication data: " + data );
