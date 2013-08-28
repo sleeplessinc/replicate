@@ -69,11 +69,12 @@ replicate = function( id, data, callback ) {
 			}
 		}
 
-		replicate.reset = function( id ) {
-			var tem = replicate.templates[ id ];
-			if( ! tem ) {
+		replicate.reset = function( key ) {
+
+			var tem = replicate.templates[ key ];
+			if( ! tem ) 
 				return;
-			}
+	
 			var clones = tem.clones;
 			var l = clones.length;
 			if( l > 0 ) {
@@ -85,26 +86,35 @@ replicate = function( id, data, callback ) {
 					}
 				}
 			}
+
 			tem.mom.insertBefore( tem, tem.sib ); // put template back into DOM
 		}
 
 	}
 
-	var tem = null; 
-	if( typeof id === "string" ) {
-		tem = document.getElementById( id );
-	}
-	else {
+
+	var tem = null;
+
+	if( typeof id === "object" ) {
 		tem = id;
-		id = "replicate_" + replicate.seq;
-		replicate.seq += 1;
+		id = tem.replicateId;
+		if( ! id ) {
+			id = "replicate_" + replicate.seq;
+			replicate.seq += 1;
+			tem.replicateId = id;
+		}
 	}
-	if( ! tem ) {
-		console.log( "replicate: template not found: " + id );
-		return;
+	if( id ) {
+		replicate.reset( id );
 	}
 
-	replicate.reset( id );
+	if( ! tem ) {
+		tem = document.getElementById( id );
+		if( ! tem ) {
+			console.log( "replicate: template not found: " + id );
+			return;
+		}
+	}
 
 	replicate.templates[ id ] = tem;		// store in cache for later "reset".
 
