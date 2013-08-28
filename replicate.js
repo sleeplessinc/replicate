@@ -25,6 +25,8 @@ IN THE SOFTWARE.
 replicate = function( id, data, callback ) {
 
 	if( ! replicate.templates ) {
+		
+		replicate.seq = 1;
 
 		replicate.templates = {};				// initialize template cache
 
@@ -88,19 +90,22 @@ replicate = function( id, data, callback ) {
 
 	}
 
-	replicate.reset( id );
-
 	var tem = null; 
 	if( typeof id === "string" ) {
 		tem = document.getElementById( id );
 	}
 	else {
 		tem = id;
+		id = "replicate_" + replicate.seq;
+		replicate.seq += 1;
 	}
 	if( ! tem ) {
 		console.log( "replicate: template not found: " + id );
 		return;
 	}
+
+	replicate.reset( id );
+
 	replicate.templates[ id ] = tem;		// store in cache for later "reset".
 
 	if( typeof data !== "object" ) {
