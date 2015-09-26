@@ -1,0 +1,12 @@
+{
+  "name": "sleepless-replicate",
+  "version": "1.0.0",
+  "description": "Replicate DOM elements using a template and data injection",
+  "author": "Joe Hitchens <joe@sleepless.com> (sleepless.com)",
+  "license": {
+    "type": "MIT"
+  },
+  "repository": "git://github.com/sleeplessinc/replicate.git",
+  "dependencies": {
+  },
+}
