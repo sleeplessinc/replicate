@@ -156,6 +156,6 @@ replicate = function( id, data, callback ) {
 	}
 
 }
-
+replicate();	// so the inject() function inside gets initialized.
 
 
