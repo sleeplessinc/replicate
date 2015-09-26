@@ -6,7 +6,5 @@
   "license": {
     "type": "MIT"
   },
-  "repository": "git://github.com/sleeplessinc/replicate.git",
-  "dependencies": {
-  },
+  "repository": "git://github.com/sleeplessinc/replicate.git"
 }
