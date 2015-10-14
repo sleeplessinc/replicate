@@ -1,0 +1,30 @@
+<html>
+<body>
+
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src=replicate.js></script>
+
+<div id=tpl_entry>
+	<h2>__title__</h2>
+	<div id=tpl_note___id__>
+		<b>Note:</b> __text__
+	</div>
+</div>
+
+<script>
+
+	entries = [
+		{ id: 1, title: "Colors", notes: [ { text: "Red" }, { text: "Blue" }, ] },
+		{ id: 2, title: "Flavors", notes: [ { text: "Chocolate" }, { text: "Strawberry" }, ] },
+	];
+
+	tpl_entry = document.getElementById("tpl_entry");
+	replicate( tpl_entry, entries, function(e, d, i) {
+		var notes = d.notes;
+		replicate( "tpl_note_"+d.id, notes, function(e, d, i) {
+		});
+	});
+	
+
+</script>
+
