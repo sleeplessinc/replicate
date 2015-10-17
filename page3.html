@@ -18,12 +18,40 @@
 		{ id: 2, title: "Flavors", notes: [ { text: "Chocolate" }, { text: "Strawberry" }, ] },
 	];
 
-	tpl_entry = document.getElementById("tpl_entry");
-	replicate( tpl_entry, entries, function(e, d, i) {
-		var notes = d.notes;
-		replicate( "tpl_note_"+d.id, notes, function(e, d, i) {
+	seq = 1;
+
+	step = function() {
+
+		seq += 1;
+
+		entries = [];
+
+		var n = parseInt(Math.random() * 100) + 20;
+
+		for(var i = 0; i < n; i++) {
+			var en = {
+				id: i,
+				title: "title-"+seq+"-"+i,
+				notes: [],
+			};
+			var nn = parseInt(Math.random() * 10) + 1;
+			for(var j = 0; j < nn; j++) {
+				en.notes.push({ text: "text-"+seq+"-"+j, });
+			}
+			entries.push(en);
+		}
+
+		replicate( "tpl_entry", entries, function(e, d, i) {
+			var notes = d.notes;
+			replicate( "tpl_note_"+d.id, notes, function(e, d, i) {
+			});
 		});
-	});
+
+	}
+
+	replicate( "tpl_entry", []);
+
+	setInterval(step, 3000);
 	
 
 </script>

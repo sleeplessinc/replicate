@@ -21,13 +21,13 @@ IN THE SOFTWARE.
 */
 
 
-replicate = function( id, data, callback ) {
+replicate = function( rid, data, callback ) {
 
 	if( ! replicate.templates ) {
 
 		// first call to function
 
-		replicate.seq = 1;			// used when generating id's
+		replicate.seq = 1;			// used to generating rid's
 		replicate.templates = {};	// initialize template cache
 
 		// replaces instances of "__key__" in string s, with values from corresponding key in data
@@ -76,12 +76,12 @@ replicate = function( id, data, callback ) {
 			}
 		}
 
-
+/*
 		// removes clones previously injected into DOM (if any), and replace the template back into the dom at
 		// it's original position
-		replicate.reset = function( key ) {
+		replicate.reset = function( rid ) {
 
-			var tem = replicate.templates[ key ];
+			var tem = replicate.templates[ rid ];
 			if( ! tem ) 
 				return;
 	
@@ -99,75 +99,96 @@ replicate = function( id, data, callback ) {
 
 			tem.mom.insertBefore( tem, tem.sib ); // put template back into DOM
 		}
-
+*/
 	}
 
-
-	if(typeof id === "undefined") {
+	if(typeof rid === "undefined") {
 		return;
+	}
+
+	if( ! ( data instanceof Array ) ) {
+		throw new Error( "replicate: replication data is not an array" );
+	}
+	// check first element in array
+	if(data.length > 0 && typeof data[0] !== "object") {
+		throw new Error( "replicate: replication data array does not contain objects" );
 	}
 
 	var tem = null;
 
-	if( typeof id === "object" ) {
-		// an element is being passed in rather than the an id
-		tem = id;
-		id = tem.replicateId;
-		if( ! id ) {
-			id = "replicate_" + replicate.seq;
-			replicate.seq += 1;
-			tem.replicateId = id;
+	if( rid instanceof HTMLElement ) { //typeof rid === "object" ) 
+		// an element is being passed in rather than an element id
+		tem = rid;
+		rid = tem.id;
+		if( ! rid ) {
+			rid = tem.replicateId;
+			if( ! rid ) {
+				rid = "replicate_" + replicate.seq;
+				replicate.seq += 1;
+			}
 		}
 	}
-
-	if( id ) {
-		replicate.reset( id );
-	}
-
-	if( ! tem ) {
-		tem = document.getElementById( id );
-		if( ! tem ) {
-			console.log( "replicate: template not found: " + id );
-			return;
+	else
+	if( typeof rid === "string" ) {
+		tem = document.getElementById( rid );
+		if(!tem) {
+			tem = replicate.templates[ rid ];
+			if( ! tem ) {
+				throw new Error( "replicate: template not found: " + rid );
+			}
+		}
+		else {
+			tem.sib = tem.nextSibling 			// remember sibling - might be null
+			tem.mom = tem.parentNode;			// remember mommy
 		}
 	}
-
-	replicate.templates[ id ] = tem;		// store the template element in cache
-
-	if( typeof data !== "object" ) {
-		console.log( "replicate: invalid replication data: " + data );
-		return
+	else {
+		throw new Error( "replicate: invalid template or element id");
 	}
 
-	if( ! ( data instanceof Array ) ) {
-		data = [ data ]
+	tem.replicateId = rid;
+
+	if(tem.parentNode) {
+		tem.parentNode.removeChild( tem );	// take template out of the DOM
 	}
 
-	// store some stuff into the template element
-	tem.mom = tem.parentNode;			// mommy
-	tem.sib = tem.nextSibling 			// sibling - might be null
-	tem.parentNode.removeChild( tem );	// take template out of the DOM
-	tem.clones = [];					// prep array for references to the clones
+	if(!tem.clones) {
+		tem.clones = [];					// prep array for references to the clones
+	}
 
-	// now walk through the data array
-	// each entry in the array is an object
-	// clone the template for each object, and inject the data from the object into the clone
+	replicate.templates[ rid ] = tem;		// store the template in cache
+
+	// replicate the template by cloning it and injecting the data into it.
+	// replace existing clones as we go (as opposed to removing them all first then recreateing, which
+	// is disruptive to the UI, and can dramatically change currently viewed page position).
 	var l = data.length
+	var clones = tem.clones;
+	var mom = tem.mom;
 	for( var i = 0 ; i < l ; i++ ) {
-		var d = data[ i ]
+		var d = data[ i ]					// get the data src
+		var cl = clones[ i ];				// get corresponding clone (may be undefined)
 
-		var e = tem.cloneNode( true )			// clone the template
-		e.removeAttribute( "id" );				// clear the id from the cloned element
+		var e = tem.cloneNode( true )		// clone the template
+		e.removeAttribute( "id" );			// clear the id from the cloned element
 
-		tem.clones.push( e );					// put the clone into the reference array for later
+		if(cl) {
+			mom.replaceChild(e, cl);
+		}
+		else {
+			mom.insertBefore( e, tem.sib );	// insert the clone into the dom
+		}
+		clones[i] = e;
 
-		tem.mom.insertBefore( e, tem.sib );		// insert the clone into the dom
-
-		replicate.inject( e, d );				// inject the data into the element
+		replicate.inject( e, d );			// inject the data into the element
 
 		if( callback ) {
-			callback( e, d, i );				// lets caller do stuff after each clone is created
+			callback( e, d, i );			// lets caller do stuff after each clone is created
 		}
+	}
+	// remove any previous clones that are in excess of the new data
+	for(var i = l; i < clones.length; i++) {
+		clones[i].remove();
+		clones[i] = null;
 	}
 
 }
