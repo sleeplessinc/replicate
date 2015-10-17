@@ -24,11 +24,13 @@ IN THE SOFTWARE.
 replicate = function( id, data, callback ) {
 
 	if( ! replicate.templates ) {
-		
-		replicate.seq = 1;
 
-		replicate.templates = {};				// initialize template cache
+		// first call to function
 
+		replicate.seq = 1;			// used when generating id's
+		replicate.templates = {};	// initialize template cache
+
+		// replaces instances of "__key__" in string s, with values from corresponding key in data
 		replicate.substitute = function( s, data ) {
 			for( var key in data ) {
 				var re = new RegExp( "__" + key + "__", "g" );
@@ -37,8 +39,14 @@ replicate = function( id, data, callback ) {
 			return s;
 		}
 
+		// injects data values into a single element
 		replicate.inject = function( e, data ) {
+
+			// inject into the body of the element
 			e.innerHTML = replicate.substitute( e.innerHTML, data );
+
+			// inject into the attributes of the actual tag of the element
+			// do this slightly differently for IE because IE is stupid
 			var attrs = e.attributes;
 			if( navigator.appName == "Microsoft Internet Explorer" ) {
 				for( var k in attrs ) {
@@ -68,6 +76,9 @@ replicate = function( id, data, callback ) {
 			}
 		}
 
+
+		// removes clones previously injected into DOM (if any), and replace the template back into the dom at
+		// it's original position
 		replicate.reset = function( key ) {
 
 			var tem = replicate.templates[ key ];
@@ -92,9 +103,14 @@ replicate = function( id, data, callback ) {
 	}
 
 
+	if(typeof id === "undefined") {
+		return;
+	}
+
 	var tem = null;
 
 	if( typeof id === "object" ) {
+		// an element is being passed in rather than the an id
 		tem = id;
 		id = tem.replicateId;
 		if( ! id ) {
@@ -103,6 +119,7 @@ replicate = function( id, data, callback ) {
 			tem.replicateId = id;
 		}
 	}
+
 	if( id ) {
 		replicate.reset( id );
 	}
@@ -115,7 +132,7 @@ replicate = function( id, data, callback ) {
 		}
 	}
 
-	replicate.templates[ id ] = tem;		// store in cache for later "reset".
+	replicate.templates[ id ] = tem;		// store the template element in cache
 
 	if( typeof data !== "object" ) {
 		console.log( "replicate: invalid replication data: " + data );
@@ -126,31 +143,30 @@ replicate = function( id, data, callback ) {
 		data = [ data ]
 	}
 
-	var mom = tem.parentNode
-	tem.mom = mom;
+	// store some stuff into the template element
+	tem.mom = tem.parentNode;			// mommy
+	tem.sib = tem.nextSibling 			// sibling - might be null
+	tem.parentNode.removeChild( tem );	// take template out of the DOM
+	tem.clones = [];					// prep array for references to the clones
 
-	var sib = tem.nextSibling 	// might be null
-	tem.sib = sib;
-
-	tem.parentNode.removeChild( tem );		// take template element out of DOM
-
-	tem.clones = [];	// references to the clones
-
+	// now walk through the data array
+	// each entry in the array is an object
+	// clone the template for each object, and inject the data from the object into the clone
 	var l = data.length
 	for( var i = 0 ; i < l ; i++ ) {
-		var a = data[ i ]
+		var d = data[ i ]
 
-		var e = tem.cloneNode( true )
-		e.removeAttribute( "id" );		// "delete e.id" doesn't work in IE
+		var e = tem.cloneNode( true )			// clone the template
+		e.removeAttribute( "id" );				// clear the id from the cloned element
 
-		tem.clones.push( e );
+		tem.clones.push( e );					// put the clone into the reference array for later
 
-		mom.insertBefore( e, sib );
+		tem.mom.insertBefore( e, tem.sib );		// insert the clone into the dom
 
-		replicate.inject( e, a );
+		replicate.inject( e, d );				// inject the data into the element
 
 		if( callback ) {
-			callback( e, a, i );
+			callback( e, d, i );				// lets caller do stuff after each clone is created
 		}
 	}
 
