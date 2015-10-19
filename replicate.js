@@ -186,11 +186,9 @@ replicate = function( rid, data, callback ) {
 		}
 	}
 	// remove any previous clones that are in excess of the new data
-	for(var i = l; i < clones.length; i++) {
-		if(clones[i]) {
-			clones[i].remove();
-			clones.splice(i, 1);
-		}
+	while(clones.length > l) {
+		clones[l].remove();
+		clones.splice(l, 1);
 	}
 
 }
