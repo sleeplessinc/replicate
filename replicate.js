@@ -187,7 +187,7 @@ replicate = function( rid, data, callback ) {
 	}
 	// remove any previous clones that are in excess of the new data
 	while(clones.length > l) {
-		clones[l].remove();
+		clones[l].parentNode.removeChild(clones[l]); //remove();		// IE is so fuckin stupid.
 		clones.splice(l, 1);
 	}
 
