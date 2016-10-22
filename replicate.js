@@ -118,17 +118,15 @@ replicate = function( rid, data, callback ) {
 
 	if( rid instanceof HTMLElement ) { //typeof rid === "object" ) 
 		// an element is being passed in rather than an element id
-		tem = rid;
-		rid = tem.id;
+		var e = rid;
+		rid = e.id;
 		if( ! rid ) {
-			rid = tem.replicateId;
-			if( ! rid ) {
-				rid = "replicate_" + replicate.seq;
-				replicate.seq += 1;
-			}
+			rid = "replicate_" + replicate.seq;
+			replicate.seq += 1;
+			e.id = rid;
 		}
 	}
-	else
+
 	if( typeof rid === "string" ) {
 		tem = document.getElementById( rid );
 		if(!tem) {
@@ -145,8 +143,6 @@ replicate = function( rid, data, callback ) {
 	else {
 		throw new Error( "replicate: invalid template or element id");
 	}
-
-	tem.replicateId = rid;
 
 	if(tem.parentNode) {
 		tem.parentNode.removeChild( tem );	// take template out of the DOM

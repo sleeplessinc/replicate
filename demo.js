@@ -5,13 +5,15 @@ var show = function( el ) {
 
 setTimeout(function() {
 
-
 	// structure of the html is irrelevant.  only the injection points matter.
+	var mi_tpl = document.getElementById("menuitem");
+	mi_tpl.removeAttribute("id");
+
 	var menudata = [
 		{ page: "./page1.html", label: "Page #1", },
 		{ page: "./page2.html", label: "Page #2", },
 	]
-	replicate( "menuitem", menudata, show );
+	replicate( mi_tpl, menudata, show );
 
 
 	// a repeating set of substitutions using an array of json objects
@@ -22,15 +24,23 @@ setTimeout(function() {
 	]
 	replicate( "protodiv", data, show );
 
-
 	setTimeout(function() {
 		// demonstrating resetting and inserting new data.
+
+		var menudata = [
+			{ page: "./page1.html", label: "PAGE-1", },
+			{ page: "./page2.html", label: "PAGE-2", },
+		]
+		replicate( mi_tpl, menudata, show );
+
+
 		var data2 = [
 			{heading: "Earth", name:"Home of the brave", when:""},
 			{heading: "Mars", name:"Home of the green", when:""},
 			{heading: "Venus", name:"Home of the hotties", when:""},
 		]
 		replicate( "protodiv", data2, show )
+
 	}, 3000)
 
 
