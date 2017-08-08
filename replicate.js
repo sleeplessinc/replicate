@@ -144,36 +144,44 @@ replicate = function( rid, data, callback ) {
 		throw new Error( "replicate: invalid template or element id");
 	}
 
+	replicate.templates[ rid ] = tem;		// store the template in cache
+
 	if(tem.parentNode) {
 		tem.parentNode.removeChild( tem );	// take template out of the DOM
 	}
 
-	if(!tem.clones) {
-		tem.clones = [];					// prep array for references to the clones
+	if(tem.clones) {
+		tem.clones.forEach(function(clone) {
+			clones.parentNode.removeChild(clones); //remove();        // IE is so fuckin stupid.
+		});
 	}
+	tem.clones = [];
 
-	replicate.templates[ rid ] = tem;		// store the template in cache
+	//for(var z = 0; z < tem.clones.length; z++) {
+	//	tem.clones[z].parentNode.removeChild(tem.clones[z]); //remove();        // IE is so fuckin stupid.
+	//}
+	//tem.clones = [];
 
 	// replicate the template by cloning it and injecting the data into it.
 	// replace existing clones as we go (as opposed to removing them all first then recreateing, which
 	// is disruptive to the UI, and can dramatically change currently viewed page position).
 	var l = data.length
-	var clones = tem.clones;
 	var mom = tem.mom;
 	for( var i = 0 ; i < l ; i++ ) {
 		var d = data[ i ]					// get the data src
-		var cl = clones[ i ];				// get corresponding clone (may be undefined)
+		//var cl = clones[ i ];				// get corresponding clone (may be undefined)
 
 		var e = tem.cloneNode( true )		// clone the template
 		e.removeAttribute( "id" );			// clear the id from the cloned element
 
-		if(cl) {
-			mom.replaceChild(e, cl);
-		}
-		else {
+		//if(cl) {
+		//	mom.replaceChild(e, cl);
+		//}
+		//else {
 			mom.insertBefore( e, tem.sib );	// insert the clone into the dom
-		}
-		clones[i] = e;
+		//}
+
+		tem.clones.push(e); //[i] = e;
 
 		replicate.inject( e, d );			// inject the data into the element
 
@@ -181,11 +189,12 @@ replicate = function( rid, data, callback ) {
 			callback( e, d, i );			// lets caller do stuff after each clone is created
 		}
 	}
+
 	// remove any previous clones that are in excess of the new data
-	while(clones.length > l) {
-		clones[l].parentNode.removeChild(clones[l]); //remove();		// IE is so fuckin stupid.
-		clones.splice(l, 1);
-	}
+	//while(clones.length > l) {
+	//	clones[l].parentNode.removeChild(clones[l]); //remove();		// IE is so fuckin stupid.
+	//	clones.splice(l, 1);
+	//}
 
 }
 
