@@ -152,7 +152,7 @@ replicate = function( rid, data, callback ) {
 
 	if(tem.clones) {
 		tem.clones.forEach(function(clone) {
-			clones.parentNode.removeChild(clones); //remove();        // IE is so fuckin stupid.
+			clone.parentNode.removeChild(clone); //remove();        // IE is so fuckin stupid.
 		});
 	}
 	tem.clones = [];
