@@ -150,17 +150,13 @@ replicate = function( rid, data, callback ) {
 		tem.parentNode.removeChild( tem );	// take template out of the DOM
 	}
 
+	// remove from the DOM, all the clones that I created and inserted last time around for this same template
 	if(tem.clones) {
 		tem.clones.forEach(function(clone) {
 			clone.parentNode.removeChild(clone); //remove();        // IE is so fuckin stupid.
 		});
 	}
 	tem.clones = [];
-
-	//for(var z = 0; z < tem.clones.length; z++) {
-	//	tem.clones[z].parentNode.removeChild(tem.clones[z]); //remove();        // IE is so fuckin stupid.
-	//}
-	//tem.clones = [];
 
 	// replicate the template by cloning it and injecting the data into it.
 	// replace existing clones as we go (as opposed to removing them all first then recreateing, which
@@ -169,17 +165,11 @@ replicate = function( rid, data, callback ) {
 	var mom = tem.mom;
 	for( var i = 0 ; i < l ; i++ ) {
 		var d = data[ i ]					// get the data src
-		//var cl = clones[ i ];				// get corresponding clone (may be undefined)
 
 		var e = tem.cloneNode( true )		// clone the template
 		e.removeAttribute( "id" );			// clear the id from the cloned element
 
-		//if(cl) {
-		//	mom.replaceChild(e, cl);
-		//}
-		//else {
-			mom.insertBefore( e, tem.sib );	// insert the clone into the dom
-		//}
+		mom.insertBefore( e, tem.sib );	// insert the clone into the dom
 
 		tem.clones.push(e); //[i] = e;
 
@@ -189,12 +179,6 @@ replicate = function( rid, data, callback ) {
 			callback( e, d, i );			// lets caller do stuff after each clone is created
 		}
 	}
-
-	// remove any previous clones that are in excess of the new data
-	//while(clones.length > l) {
-	//	clones[l].parentNode.removeChild(clones[l]); //remove();		// IE is so fuckin stupid.
-	//	clones.splice(l, 1);
-	//}
 
 }
 
