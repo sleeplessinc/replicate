@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Sleepless Software Inc. All rights reserved.
+Copyright 2015-2019 Sleepless Software Inc. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -75,31 +75,6 @@ replicate = function( rid, data, callback ) {
 				}
 			}
 		}
-
-/*
-		// removes clones previously injected into DOM (if any), and replace the template back into the dom at
-		// it's original position
-		replicate.reset = function( rid ) {
-
-			var tem = replicate.templates[ rid ];
-			if( ! tem ) 
-				return;
-	
-			var clones = tem.clones;
-			var l = clones.length;
-			if( l > 0 ) {
-				// remove the clones.
-				for( var i = 0; i < l; i++ ) {
-					var clone = clones[ i ];
-					if( clone.parentNode ) {	// could be null if already removed from DOM
-						clone.parentNode.removeChild( clone );
-					}
-				}
-			}
-
-			tem.mom.insertBefore( tem, tem.sib ); // put template back into DOM
-		}
-*/
 	}
 
 	if(typeof rid === "undefined") {
@@ -183,5 +158,4 @@ replicate = function( rid, data, callback ) {
 }
 
 replicate();	// so the inject() function inside gets initialized.
-
 
